@@ -6,22 +6,12 @@ build-backend = "setuptools.build_meta"
 name = "easy_multiprocess"
 version = "1.0.0"
 description = "Use all your cores with no extra code"
-authors = [{name = "Your Name"}]  # Optional, remove or uncomment
-license = {text = "MIT License"}  # Specify more details or a different license if needed
-readme = "README.md"  # Ensure you have a README.md in your project root
+authors = [{name = "Pranay"}]
+license = {text = "MIT License"}
+readme = "README.md"
 
-# Classifiers help users find your project
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
-
-# Dependencies can be listed here
-dependencies = [
-    # "some_dependency>=1.0",
-]
-
-# If your package includes executable scripts or entry points
-# [project.entry-points."console_scripts"]
-# your_command = "easy_multiprocess.module:main_function"

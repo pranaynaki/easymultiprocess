@@ -1,4 +1,6 @@
-
+# easy_multiprocess
+```easy_multiprocess``` is a package that makes it extremely simple to multiprocess.
+___
 #### Multiprocess your code with just 1 line!
 
 ```python
@@ -7,7 +9,7 @@ def func1(x):
 	# some heavy computing
     ...
 
-A = [func1(i) for i in range(16)]
+a = [func1(i) for i in range(16)]
 
 # After:
 @parallelize
@@ -27,7 +29,7 @@ def func1(x):
 
 # concurrent.futures
 with ProcessPoolExecutor() as pool:
-	A = list(pool.map(func1, range(16)))
+	a = list(pool.map(func1, range(16)))
 ```
 ---
 #### Other multiprocess libraries don't use all cores (when multiple operations occur). 
@@ -68,8 +70,8 @@ print(a, b, c, d)
 # elapsed time = 10s
 ```
 ---
-### Non Embarrasingly Parallel Code
-It even works for the non-[embarrassingly parallel](https://en.wikipedia.org/wiki/Embarrassingly_parallel) case (but might take longer):
+#### Non Embarrasingly Parallel Code
+It even works for the non-[embarrassingly parallel](https://en.wikipedia.org/wiki/Embarrassingly_parallel) case (but might be [suboptimal](#limitations)):
 
 ```python
 # func1, func2... each take 10 seconds
@@ -81,12 +83,26 @@ print(a, b, c, d)
 
 # elapsed time = 30s
 ```
-`easy_multiprocess` implicitly uses a DAG computation graph for this (other libraries have similar mechanisms like [Ray's DAG](https://docs.ray.io/en/latest/ray-core/ray-dag.html)). See [Limitations](#limitations) for where this doesn't work.
+`easy_multiprocess` implicitly uses a DAG computation graph for this (other libraries have similar mechanisms, such as [Ray's DAG](https://docs.ray.io/en/latest/ray-core/ray-dag.html)). See [Limitations](#limitations) for where this doesn't work.
 
 ---
-#### Installation
+#### User Installation
+On Mac/Linux/Unix-like:
 ```
 pip install easy_multiprocess
+```
+(Windows not currently supported)
+
+---
+#### Developer Installation
+```
+git clone <this_repo>
+cd easymultiprocess
+pip install -e .
+```
+Then, run tests:
+```
+python -m unittest tests.test
 ```
 ---
 #### Author Notes
@@ -95,9 +111,10 @@ I built ```easy_multiprocess``` simply to learn how to build a python package.
 It's built on top of ```concurrent.futures```, rather than being built from the ground up using OS-level primitives, since that would've taken me over 10x as much time and code to build. **This means it has MANY limitations.**
 
 #### Limitations:
-- ```is``` comparisons aren't supported for the ```FutureResult``` objects due to python identity (it would require the user to install/use a custom python interpreter fork, which I would also have to spend time to build. This would anyway defeat the purpose of user-friendliness). This means that for ```is``` operations involving any output from any ```@parallelize```-d function, the user should use ```==``` instead, or call ```.result()``` before using ```is``` (similar to any ```future``` object from other multiprocess libraries)
+- ```is``` comparisons aren't supported for ```FutureResult``` objects due to python identity. This means that for ```is``` operations involving any output from any ```@parallelize```-d function, the user should use ```==``` instead, or call ```.result()``` before using ```is``` (similar to any ```future``` object from other multiprocess libraries). Adding support for this would require the user to install/use an inefficient custom python interpreter fork, which I would also have to spend time to build. This would anyway defeat the purpose of user-friendliness.
 - Standard IO streams are not guaranteed to work correctly
-- The non-embarrassingly parallel case is not optimally implemented (see the [example](#non-embarrasingly-parallel-code), which takes 30s instead of 20s in the ideal case), but can be improved in the future
+- The non-embarrassingly parallel case is suboptimally implemented (see the [example](#non-embarrasingly-parallel-code), which should take 20s in the ideal case), but can be improved in the future
+- Requires Copy-on-write, so only works on Mac/Linux/Unix-like (system with fork method)
 
 General limitations of all common python multiprocessing libraries:
 - Closure variables cannot be created/updated once processes are set up (for std library concurrent futures, this occurs upon first submission to executor). You can get around this by calling ```ProcessPoolManager.cleanup``` and ```get_executor``` again. (TODO: add code sample)

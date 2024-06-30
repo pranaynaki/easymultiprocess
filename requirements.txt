@@ -1,7 +1,0 @@
-scikit-learn
-matplotlib
-pandas
-numpy
-ipykernel
-h5py
-pygame
