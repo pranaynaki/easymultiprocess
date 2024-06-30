@@ -4,6 +4,10 @@ import atexit
 import functools
 import os
 
+# change default start method to fork
+import multiprocessing
+multiprocessing.set_start_method('fork')
+
 class ProcessPoolManager:
     _process_pool = None
     _debug = False

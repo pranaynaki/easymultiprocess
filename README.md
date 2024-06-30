@@ -114,7 +114,7 @@ It's built on top of ```concurrent.futures```, rather than being built from the 
 - ```is``` comparisons aren't supported for ```FutureResult``` objects due to python identity. This means that for ```is``` operations involving any output from any ```@parallelize```-d function, the user should use ```==``` instead, or call ```.result()``` before using ```is``` (similar to any ```future``` object from other multiprocess libraries). Adding support for this would require the user to install/use an inefficient custom python interpreter fork, which I would also have to spend time to build. This would anyway defeat the purpose of user-friendliness.
 - Standard IO streams are not guaranteed to work correctly
 - The non-embarrassingly parallel case is suboptimally implemented (see the [example](#non-embarrasingly-parallel-code), which should take 20s in the ideal case), but can be improved in the future
-- Requires Copy-on-write, so only works on Mac/Linux/Unix-like (system with fork method)
+- Requires Copy-on-write, so only works on Mac/Linux/Unix-like (system with `fork` method)
 
 General limitations of all common python multiprocessing libraries:
 - Closure variables cannot be created/updated once processes are set up (for std library concurrent futures, this occurs upon first submission to executor). You can get around this by calling ```ProcessPoolManager.cleanup``` and ```get_executor``` again. (TODO: add code sample)
@@ -125,3 +125,6 @@ General limitations of all common python multiprocessing libraries:
 Other Notes:
 - The ```@parallelize``` decorator will send off the code it wraps to another process
 - ```parallelize``` sounds more intuitive (and cooler), but ```concurrent``` is technically "correct". If you want, you can use ```@concurrent``` instead
+
+Future improvements:
+- Avoid `pickle`-ing arguments. Instead, wrap the function and turn its `args` into closure variables (copy-on-write would apply). Even if you pass in a large arg (such as a large ML model), it would not delay, or need to copy the large arg over to, the subprocess.
